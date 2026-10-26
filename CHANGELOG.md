@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.5.4 - 2026-10-26
 
 - **Desktop tools work again when the driver service is stopped.** With
   the service stopped, Cua Driver cannot read its macOS permissions, and
