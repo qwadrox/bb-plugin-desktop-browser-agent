@@ -245,12 +245,17 @@ function sessionLabel(prefix: string, suffix: string): string {
   return head.length > 0 ? `${head}-${tail}` : tail;
 }
 
-function missingMacPermissions(status: DriverStatus): string[] {
+/**
+ * macOS permissions the driver reports as `missing` (false) or cannot confirm
+ * (`unconfirmed`: null, as `permissions status` answers while no daemon runs).
+ */
+function macPermissionGaps(status: DriverStatus, kind: "missing" | "unconfirmed"): string[] {
   if (status.platform !== "darwin" || !status.installed) return [];
-  const missing: string[] = [];
-  if (status.permissions?.accessibility !== true) missing.push("Accessibility");
-  if (status.permissions?.screenRecording !== true) missing.push("Screen Recording");
-  return missing;
+  const wanted = kind === "missing" ? false : null;
+  const gaps: string[] = [];
+  if ((status.permissions?.accessibility ?? null) === wanted) gaps.push("Accessibility");
+  if ((status.permissions?.screenRecording ?? null) === wanted) gaps.push("Screen Recording");
+  return gaps;
 }
 
 function readinessLine(status: DriverStatus | null): string {
@@ -264,10 +269,16 @@ function readinessLine(status: DriverStatus | null): string {
       ? `Cua Driver ${version} is installed (the version this plugin was tested with).`
       : `Cua Driver ${version} is installed; this plugin was tested with ${TESTED_DRIVER_VERSION}.`,
   ];
-  const missing = missingMacPermissions(status);
+  const missing = macPermissionGaps(status, "missing");
   if (missing.length > 0) {
     parts.push(
-      `macOS permissions are missing or unconfirmed: ${missing.join(", ")}. Open ${SETTINGS_PATH}, expand this machine, and select Grant macOS permissions.`,
+      `macOS permissions are missing: ${missing.join(", ")}. Open ${SETTINGS_PATH}, expand this machine, and select Grant macOS permissions.`,
+    );
+  }
+  const unconfirmed = macPermissionGaps(status, "unconfirmed");
+  if (unconfirmed.length > 0) {
+    parts.push(
+      `macOS permissions are not confirmed yet (${unconfirmed.join(", ")}): call the tools anyway; a missing one is reported by the call.`,
     );
   }
   if (status.daemonRunning === false) parts.push("The driver service was not running at last check; the first call starts it on demand.");
@@ -293,10 +304,11 @@ function setupGuidance(status: DriverStatus, hostId: string): string | null {
       `CLI alternative: \`bb cua install --yes --host ${hostId}\`. Retry the tool after the checklist shows Ready.`,
     ].join("\n\n");
   }
-  const missing = missingMacPermissions(status);
+  // Unconfirmed permissions do not block: the call starts the driver, and a real gap comes back as a permission failure.
+  const missing = macPermissionGaps(status, "missing");
   if (missing.length === 0) return null;
   return [
-    `Desktop & Browser Agent setup is required. macOS permissions are missing or unconfirmed: **${missing.join(", ")}**.`,
+    `Desktop & Browser Agent setup is required. macOS permissions are missing: **${missing.join(", ")}**.`,
     `[Open Desktop & Browser Agent settings](${SETTINGS_PATH}), expand this machine, and select **Grant macOS permissions**. Approve the system prompts; a one-time direct-capture prompt may also appear on the first screenshot.`,
     `CLI alternative: \`bb cua grant --host ${hostId}\`. Retry the tool after the checklist shows Ready.`,
   ].join("\n\n");

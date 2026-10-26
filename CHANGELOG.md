@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- **Desktop tools work again when the driver service is stopped.** With
+  the service stopped, Cua Driver cannot read its macOS permissions, and
+  every desktop tool was refused as "setup is required" even when the
+  permissions were granted. Unconfirmed permissions no longer block a call:
+  the call starts the service, and a permission that is really missing still
+  comes back with the setup link.
+
 ## 0.5.3 - 2026-10-20
 
 - **Release notes on GitHub.** Each version's GitHub release shows its

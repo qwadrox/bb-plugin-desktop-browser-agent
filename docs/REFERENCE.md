@@ -265,8 +265,10 @@ also appear on the first screenshot. The CLI equivalents are `bb cua install --y
 Before each Cua Driver action, the plugin checks a recent readiness snapshot.
 If the driver or a required macOS permission is missing, it stops before the
 action and returns a direct link to **Settings → Plugins → Desktop & Browser Agent** with
-the exact recovery step. Permission failures returned later by Cua Driver are
-normalized into the same guided recovery instead of inviting blind retries.
+the exact recovery step. A permission the driver cannot confirm, as when its
+service is not running, does not stop the action: the call starts the service.
+Permission failures returned later by Cua Driver are normalized into the same
+guided recovery instead of inviting blind retries.
 
 ## Staying current with Cua Driver
 

@@ -596,6 +596,16 @@ describe("setup guidance", () => {
     expect(toolCalls()).toHaveLength(0);
   });
 
+  it("lets a call start a stopped driver when its permissions are unknown", async () => {
+    // Without a running daemon, `cua-driver permissions status` can only answer `unknown`.
+    const { harness, toolCalls } = await load({
+      status: readyStatus({ daemonRunning: false, permissions: { accessibility: null, screenRecording: null, directCapture: null } }),
+    });
+    const result = structured(await harness.behavior.callAgentTool("cua_click", { pid: 4, element_token: "s1:2" }));
+    expect(text(result)).not.toMatch(/setup is required/);
+    expect(toolCalls()).toHaveLength(1);
+  });
+
   it("turns a driver permission failure into the same guided recovery", async () => {
     const { harness, hostCalls, toolCalls } = await load({
       toolResult: {
