@@ -141,3 +141,9 @@ jobs:
           else
             gh pr create --base main --head "$branch" --title "Track Cua Driver $VERSION" --body-file "$RUNNER_TEMP/body.md"
           fi
+          # One open driver PR at a time: this one supersedes older driver/v* PRs.
+          gh pr list --state open --json number,headRefName \
+            --jq ".[] | select(.headRefName | startswith(\"driver/v\")) | select(.headRefName != \"$branch\") | .number" \
+            | while read -r number; do
+                gh pr close "$number" --delete-branch --comment "Superseded by the PR for Cua Driver $VERSION."
+              done
