@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.5.5 - 2026-11-19
+
+- **Tested with Cua Driver 0.54.0.** Installs and updates now target 0.54.0.
+  Among its fixes, the macOS driver service now exits when an update
+  replaces its app instead of running on as the old version.
+- Its new `browser_motion_policy` (reduced-motion emulation for a
+  driver-owned tab) is reachable through `cua_call`.
+- `page` is now read-only in the driver (page text and DOM queries; the
+  JavaScript and page actions were removed), so it is reachable through
+  `cua_call` instead of off. It is the only reader for Safari and Firefox
+  pages.
+- `escalate_session` and `get_session_state` are gone from the driver and
+  from the plugin.
+
 ## 0.5.4 - 2026-10-26
 
 - **Desktop tools work again when the driver service is stopped.** With

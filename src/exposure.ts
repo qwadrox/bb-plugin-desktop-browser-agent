@@ -92,10 +92,12 @@ export const REVIEWED_TOOLS: Readonly<Record<string, Reviewed>> = {
   get_recording_state: call(),
   list_sessions: call(),
   get_session: call(),
-  get_session_state: call(),
-  escalate_session: call(),
+  // Experimental reduced-motion emulation for a driver-owned tab.
+  browser_motion_policy: call("browser"),
+  // Read-only as of driver 0.54 (JavaScript and page actions removed): page text and DOM queries, the only reader for Safari and Firefox.
+  page: call("browser"),
   // Off until the user turns them on: code execution, process control,
-  // installs, driver configuration, recordings, the legacy page tool.
+  // installs, driver configuration, recordings.
   run_script: off(),
   kill_app: off(),
   install_extension: off(),
@@ -104,7 +106,6 @@ export const REVIEWED_TOOLS: Readonly<Record<string, Reviewed>> = {
   replay_trajectory: off(),
   start_recording: off(),
   stop_recording: off(),
-  page: off("browser"),
   // The plugin owns each thread's session label.
   start_session: { group: "desktop", exposure: "managed" },
   end_session: { group: "desktop", exposure: "managed" },

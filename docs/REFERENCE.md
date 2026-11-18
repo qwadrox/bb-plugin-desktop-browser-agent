@@ -346,7 +346,7 @@ thread turn ──▶ bb server (plugin server.ts)
   whole screen, uploading or downloading files, attaching to a signed-in
   browser, and the `run_script`, `kill_app`, `install_extension`, `set_config`,
   `start_recording` and `replay_trajectory` tools once you expose them.
-  `install_ffmpeg`, `stop_recording` and `page` are off by default and do not
+  `install_ffmpeg` and `stop_recording` are off by default and do not
   ask when exposed. **Allow once**, **Allow for this thread** (until the
   thread is archived or the plugin reloads), or **Don't allow**; an
   unanswered request is refused after ten minutes. The first `browser_*` call
