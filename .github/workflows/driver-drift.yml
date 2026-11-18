@@ -1,10 +1,11 @@
 # Notices a new Cua Driver release and opens a PR with its tool snapshot and
-# installer checksums. The daily check runs on Linux and ends in seconds when
+# installer checksums. The weekly check (Monday 06:23 UTC, before the Monday
+# afternoon update agent) runs on Linux and ends in seconds when
 # nothing changed; the macOS job runs only for a new release.
 name: driver-drift
 on:
   schedule:
-    - cron: "23 5 * * *"
+    - cron: "23 6 * * 1"
   workflow_dispatch:
     inputs:
       version:
