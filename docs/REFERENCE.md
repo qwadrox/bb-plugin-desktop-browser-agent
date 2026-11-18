@@ -287,7 +287,7 @@ How a newer driver is noticed, without anything scheduled on your Mac:
   `tools/list`, registers any new tools, and reports drift against the
   snapshot. A tool new to the plugin follows the [exposure rules](#agent-tools) until
   someone reviews it in `src/exposure.ts`.
-- **In this repo:** the `driver-drift` workflow checks daily on Linux for a
+- **In this repo:** the `driver-drift` workflow checks weekly (Mondays) on Linux for a
   newer `cua-driver-rs` release and finishes in seconds when there is none.
   For a new release, a macOS job downloads the universal binary, verifies it
   against `SHA256SUMS` and its Sigstore signature, reruns `sync:tools` and the
