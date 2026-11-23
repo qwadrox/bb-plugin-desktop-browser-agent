@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.5.6 - 2026-11-23
+
+- **Tested with Cua Driver 0.59.5.** Installs and updates now target 0.59.5.
+  Among its fixes: Chrome page content reads on the first try on macOS,
+  `browser_type` presses a real Enter for a trailing newline, macOS clicks on
+  controls behind an attached sheet are refused instead of landing in the
+  wrong place, and `list_windows` finds an app by its English name on any
+  system language.
+- `click` can now run an element's own custom accessibility actions (the
+  names an element publishes as `custom_actions`) through `action`.
+- Its new `agent_display` creates a virtual display that agents can move
+  windows to, off your screen. It is off by default, because it changes this
+  Mac's display arrangement and hides the windows it holds from you. When
+  you expose it, it asks first while **Ask before sensitive actions** is on.
+
 ## 0.5.5 - 2026-11-19
 
 - **Tested with Cua Driver 0.54.0.** Installs and updates now target 0.54.0.
