@@ -121,7 +121,7 @@ describe("catalog", () => {
 
 describe("exposure", () => {
   it("keeps code execution, process control, and driver configuration off by default", () => {
-    for (const name of ["run_script", "kill_app", "install_extension", "set_config", "replay_trajectory"]) {
+    for (const name of ["run_script", "kill_app", "install_extension", "set_config", "replay_trajectory", "agent_display"]) {
       expect(defaultExposure(name, tool(name)).exposure, name).toBe("off");
     }
     expect(defaultExposure("run_steps", tool("run_steps")).exposure).toBe("tool");

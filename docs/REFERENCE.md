@@ -338,14 +338,15 @@ thread turn ──▶ bb server (plugin server.ts)
 - Attaching to a signed-in browser profile requires a launch grant on the
   machine (`--grant existing-profile`). The plugin adds it only while
   **Signed-in browser profiles** is on (see [Signed-in browser profiles](#signed-in-browser-profiles)).
-- Tools that run code, kill processes, record, or change the driver's own
-  configuration are off until you expose them. An agent told a tool is off is
+- Tools that run code, kill processes, record, add virtual displays, or
+  change the driver's own configuration are off until you expose them. An agent told a tool is off is
   also told not to get the same result another way.
 - With **Ask before sensitive actions** on, these calls wait for your answer
   in the thread: reading clipboard text, writing the clipboard, capturing the
   whole screen, uploading or downloading files, attaching to a signed-in
   browser, and the `run_script`, `kill_app`, `install_extension`, `set_config`,
-  `start_recording` and `replay_trajectory` tools once you expose them.
+  `start_recording`, `replay_trajectory` and `agent_display` tools once you
+  expose them.
   `install_ffmpeg` and `stop_recording` are off by default and do not
   ask when exposed. **Allow once**, **Allow for this thread** (until the
   thread is archived or the plugin reloads), or **Don't allow**; an

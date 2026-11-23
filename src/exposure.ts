@@ -97,7 +97,7 @@ export const REVIEWED_TOOLS: Readonly<Record<string, Reviewed>> = {
   // Read-only as of driver 0.54 (JavaScript and page actions removed): page text and DOM queries, the only reader for Safari and Firefox.
   page: call("browser"),
   // Off until the user turns them on: code execution, process control,
-  // installs, driver configuration, recordings.
+  // installs, driver configuration, recordings, virtual displays.
   run_script: off(),
   kill_app: off(),
   install_extension: off(),
@@ -106,6 +106,8 @@ export const REVIEWED_TOOLS: Readonly<Record<string, Reviewed>> = {
   replay_trajectory: off(),
   start_recording: off(),
   stop_recording: off(),
+  // Driver 0.59: adds a virtual display to the Mac's display arrangement; windows moved there leave the user's view.
+  agent_display: off(),
   // The plugin owns each thread's session label.
   start_session: { group: "desktop", exposure: "managed" },
   end_session: { group: "desktop", exposure: "managed" },
@@ -180,6 +182,7 @@ const SENSITIVE_TOOLS: Readonly<Record<string, string>> = {
   set_config: "change Cua Driver's configuration",
   start_recording: "record your screen",
   replay_trajectory: "replay recorded actions",
+  agent_display: "add or remove a virtual display on this machine",
 };
 
 export interface SensitiveAction {
