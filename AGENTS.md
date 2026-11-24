@@ -60,6 +60,11 @@ docs/MARKETPLACE.md      the bb marketplace entry and the release steps
   `bb.settings.define`.** bb renders every declared setting in its form and
   cannot hide one, so a declared routing mode or browser-extension switch
   would show twice.
+- **The agent skill and the dedicated tools serve the everyday task.** They
+  load in every session, so a driver feature most tasks never touch goes to
+  `cua_call` and stays out of `skills/desktop-browser-agent/`; the driver's
+  schema and `get_guide` already carry it. Add a skill line or a `tool`
+  exposure only when it changes how a common run goes.
 - **A new driver tool needs a reviewed exposure in `src/exposure.ts`.**
   `src/catalog.test.ts` fails until it has one. Keep parameter names
   identical to upstream so typed tools and `cua_call` agree.

@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- The agent skill no longer covers `ui_tree_revision`; the driver's own
+  tool descriptions do, which keeps the skill to what everyday tasks need.
+
 ## 0.5.7 - 2026-11-24
 
 - **Tested with Cua Driver 0.61.2.** Installs and updates now target 0.61.2.
