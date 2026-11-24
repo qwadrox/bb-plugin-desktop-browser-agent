@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.5.7 - 2026-11-24
+
+- **Tested with Cua Driver 0.61.2.** Installs and updates now target 0.61.2.
+  Among its fixes: background pixel clicks on macOS web content land at the
+  given x,y, element scrolls aim at the part inside the window, and
+  `type_text` refuses to send keys to a target that cannot hold keyboard
+  focus (`target_focus_unconfirmed`) instead of typing elsewhere.
+- Reads of a window now return a `ui_tree_revision`. The action tools
+  (`click`, `double_click`, `right_click`, `drag`, `scroll`, `type_text`,
+  `press_key`, `hotkey`, `set_value`) take it as an optional argument and
+  refuse with `stale_revision`, before any input, when a later read saw the
+  window change. The agent skill says when to pass it.
+
 ## 0.5.6 - 2026-11-23
 
 - **Tested with Cua Driver 0.59.5.** Installs and updates now target 0.59.5.
