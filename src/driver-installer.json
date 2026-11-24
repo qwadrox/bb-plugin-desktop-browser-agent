@@ -1,10 +1,10 @@
 {
-  "driverVersion": "0.59.5",
+  "driverVersion": "0.61.2",
   "sha256": {
     "_install-common.psm1": "99f34a84ceab04d4b488b1db4d71536c7a7ac7e645ac2ec295b4fd85244085b6",
     "_install-common.sh": "cbf440c088b93666a09d9dbca1e45e32bfecd5f292299cf531e75576b2476ad6",
-    "_install-rust.sh": "a6c51b2962e5f2ad800028b19c1321cedea1f7265177172ad4368f970b393cda",
-    "install.ps1": "bcd9f026edf46964a79502fcb0dddd62ef1d7588772fba477252fd3c521d597f",
+    "_install-rust.sh": "92c46cbe5f8c3e86e032e1b277d81cb17998b6b97986f942f0909bfefb936df0",
+    "install.ps1": "a08603a958a43789bf08912c15b82ff72a6b27da5e97db43b065726b7babc40e",
     "install.sh": "c9056eea6dbbb11749059d5eb506ea800ec761d5337685ec9b307baf72399c51"
   }
 }
