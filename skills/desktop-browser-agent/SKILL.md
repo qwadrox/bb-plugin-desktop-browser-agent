@@ -107,10 +107,7 @@ and `browser_upload` attaches files without a picker.
   state or "no results" for a moment after an action. Read once more before
   acting again; a repeated click can undo the first one.
 - Stale token or ambiguous window: list windows or read again, then act on
-  the intended live target. An action given the `ui_tree_revision` of its
-  read is refused with `stale_revision`, before any input, once a later
-  read saw the window change; pass it where a shifting UI could make a
-  click land on the wrong row, and read again when refused.
+  the intended live target.
 
 ## Text and keys
 
