@@ -127,11 +127,12 @@ for bb extension. Prefer them for web pages in the user's own browser: they
 work in background tabs while the user keeps using the browser, and need no
 window, pid or foreground attach.
 
-- `browser_tabs` lists the open tabs; `browser_open {url}` opens a
-  background tab in the purple **Agent** group. Use a tab the user already
-  has open when the task is about that page (an open mail, a form they
-  started); otherwise work in a tab you opened, and do not navigate away
-  from a page the user is using.
+- `browser_tabs` groups tabs by connection. Match the user's page by title
+  and URL. Pass its exact `browser` selector to `browser_open {url, browser}`
+  and to each subsequent action on the returned tab. This opens the same URL
+  in a background Agent tab in the correct profile. Use the original tab only
+  if the user requests it. After a reconnect, list tabs again. If several
+  profiles match the task equally well, ask which page the user means.
 - `browser_read {tab_id}` returns a text outline with `[eN]` refs. Narrow it:
   `query` keeps matching lines (`query: "e12"` gives that element's line),
   `scope: "main"` or `"dialog"` or a ref reads one region, and the offset it

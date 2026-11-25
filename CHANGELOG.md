@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- List tabs across profiles of one browser and route background work to the selected connection.
+
 - The agent skill no longer covers `ui_tree_revision`; the driver's own
   tool descriptions do, which keeps the skill to what everyday tasks need.
 

@@ -106,7 +106,7 @@ export function BrowserExtensionSettings() {
                         ? "No Chromium browser found (Brave, Chrome, Edge, Chromium)."
                         : detected.map((entry) => `${entry.name}: ${entry.registered ? "set up" : "not set up"}`).join(" · ")}
                       {bridge.connections.length > 0
-                        ? ` · connected: ${bridge.connections.map((entry) => `${entry.browser} (extension v${entry.extension})`).join(", ")}`
+                        ? ` · connected: ${bridge.connections.map((entry) => `${entry.selector ?? entry.browser} (extension v${entry.extension})`).join(", ")}`
                         : ""}
                     </p>
                   ) : null}

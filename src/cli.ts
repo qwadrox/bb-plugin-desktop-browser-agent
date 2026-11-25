@@ -314,7 +314,7 @@ export function cuaCli(deps: CuaCliDeps): PluginCliRegistration {
             ...bridge.browsers
               .filter((entry) => entry.detected)
               .map((entry) => `  ${entry.name}: ${entry.registered ? "set up" : "not set up"}`),
-            `Connected: ${bridge.connections.length === 0 ? "none" : bridge.connections.map((entry) => `${entry.browser} ${entry.version} (extension v${entry.extension})`).join(", ")}`,
+            `Connected: ${bridge.connections.length === 0 ? "none" : bridge.connections.map((entry) => `${entry.selector ?? entry.browser} ${entry.version} (extension v${entry.extension})`).join(", ")}`,
             `Chrome Web Store: ${EXTENSION_STORE_URL}\nWeb Store id: ${STORE_EXTENSION_ID}\nUnpacked build id: ${UNPACKED_EXTENSION_ID}${dir === null ? "" : `\nUnpacked extension: ${dir}`}`,
           ];
           return { exitCode: 0, stdout: lines.join("\n") };
