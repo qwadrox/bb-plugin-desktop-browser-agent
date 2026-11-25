@@ -171,6 +171,7 @@ function request(path: string, method: string, params: unknown, timeoutMs: numbe
 interface LiveSocket {
   path: string;
   hello: BrowserConnection;
+  selector: string;
 }
 
 async function liveSockets(layout: BridgeLayout): Promise<LiveSocket[]> {
@@ -183,7 +184,11 @@ async function liveSockets(layout: BridgeLayout): Promise<LiveSocket[]> {
         try {
           const reply = await request(path, "hello", {}, HELLO_TIMEOUT_MS);
           const hello = reply.result as BrowserConnection | null;
-          return hello === null || hello === undefined ? null : { path, hello };
+          if (!hello) return null;
+          // Include the socket generation: a recycled process id must not select a different profile.
+          const socket = await stat(path, { bigint: true });
+          const selector = `${hello.browser}@${hello.pid}-${socket.ctimeNs.toString(36)}`;
+          return { path, hello, selector };
         } catch (error) {
           const code = (error as NodeJS.ErrnoException).code;
           if (code === "ECONNREFUSED" || code === "ENOENT") await unlink(path).catch(() => undefined);
@@ -205,7 +210,7 @@ export async function bridgeState(layout: BridgeLayout, runtime: string): Promis
       registered: await exists(manifestPath(browser)),
     })),
   );
-  const connections = installed ? (await liveSockets(layout)).map((entry) => entry.hello) : [];
+  const connections = installed ? (await liveSockets(layout)).map((entry) => ({ ...entry.hello, selector: entry.selector })) : [];
   return { supported: layout.supported, installed, browsers, connections };
 }
 
@@ -242,17 +247,33 @@ export async function callBrowser(
   }
   // A blank browser name counts as none given.
   const wanted = options.browser?.trim().toLowerCase() || undefined;
-  const matches = wanted ? live.filter((entry) => entry.hello.browser.toLowerCase() === wanted) : live;
+  const matches = wanted
+    ? live.filter((entry) => entry.hello.browser.toLowerCase() === wanted || entry.selector.toLowerCase() === wanted)
+    : live;
   if (matches.length === 0) {
     return fail(
       "no_such_browser",
       `${options.browser} is not connected. Connected: ${live.map((entry) => entry.hello.browser).join(", ")}.`,
     );
   }
-  if (matches.length > 1 && wanted === undefined) {
+  // Listing two profiles of the same browser is read-only. Keep the existing
+  // explicit choice when the connected browsers are different products.
+  if (method === "tabs" && matches.length > 1 && matches.every((entry) => entry.hello.browser === matches[0]!.hello.browser)) {
+    try {
+      const profiles = await Promise.all(matches.map(async (entry) => {
+        const reply = await request(entry.path, "tabs", params, options.timeoutMs ?? CALL_TIMEOUT_MS, options.signal);
+        if (reply.error) throw new Error(String(reply.error.message ?? "The extension refused to list tabs."));
+        return { browser: entry.selector, listing: reply.result };
+      }));
+      return { ok: true, browser: matches[0]!.hello.browser, result: { profiles } };
+    } catch (error) {
+      return fail("bridge_failed", errorMessage(error));
+    }
+  }
+  if (matches.length > 1) {
     return fail(
       "several_browsers",
-      `Several browsers are connected (${live.map((entry) => entry.hello.browser).join(", ")}). Pass browser to choose one.`,
+      `Several connections match (${matches.map((entry) => entry.selector).join(", ")}). List tabs for the desired browser, then pass the matching connection in browser.`,
     );
   }
   if (method === "upload") {
@@ -265,7 +286,10 @@ export async function callBrowser(
     if (reply.error !== undefined) {
       return { ok: false, code: String(reply.error.code ?? "failed"), message: String(reply.error.message ?? "The extension refused.") };
     }
-    return { ok: true, browser: target.hello.browser, result: reply.result };
+    const result = method === "tabs" && reply.result && typeof reply.result === "object"
+      ? { ...reply.result, browser: target.selector }
+      : reply.result;
+    return { ok: true, browser: target.hello.browser, result };
   } catch (error) {
     return fail("bridge_failed", errorMessage(error));
   }

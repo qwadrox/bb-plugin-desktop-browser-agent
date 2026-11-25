@@ -20,7 +20,7 @@ const browser = z
   .string()
   .min(1)
   .optional()
-  .describe("Which connected browser (Brave, Chrome, Edge, Chromium) when more than one has the extension");
+  .describe("Browser name, or the exact connection selector from browser_tabs to keep working in the same profile");
 const tabId = z.number().int().describe("Tab id from browser_tabs or browser_open");
 const ref = z.string().min(1).describe("Element ref such as e12 from browser_read or an earlier action's result in this tab");
 const waitFor = z
@@ -35,7 +35,7 @@ export const BROWSER_TOOLS: readonly BrowserTool[] = [
     name: "browser_tabs",
     method: "tabs",
     description:
-      "List the open tabs of the user's own browser with tab ids, titles and URLs, and whether agents are paused.",
+      "List the open tabs of the user's own browser with tab ids, titles and URLs, and whether agents are paused. Each profile is labeled with the browser selector to use for follow-up calls.",
     parameters: z.object({ browser }) satisfies z.ZodType<BridgeParams["tabs"]>,
     labels: { pending: "Listing browser tabs", completed: "Listed browser tabs" },
   },
@@ -249,6 +249,15 @@ function tabLine(tab: TabInfo): string {
   return `tab ${tab.tab_id}: ${tab.title === "" ? "(untitled)" : tab.title} — ${tab.url}`;
 }
 
+function formatTabs(result: Record<string, unknown>): string {
+  const tabs = Array.isArray(result.tabs) ? (result.tabs as Array<TabInfo & { active?: boolean; window_id?: number; dialog?: unknown }>) : [];
+  const lines = tabs.map(
+    (tab) => `- ${tabLine(tab)}${tab.active === true ? " (in front)" : ""}${tab.dialog !== undefined ? " (shows a dialog: answer it with browser_dialog)" : ""}`,
+  );
+  if (result.paused === true) lines.unshift("The user paused agents in the browser extension: do not act in these tabs until they resume.");
+  return lines.length > 0 ? lines.join("\n") : "The browser has no open tabs.";
+}
+
 /** The agent reads results as text: what was done, what it changed, and what to do about a dialog or a new tab. */
 export function formatResult(tool: BrowserTool, result: Record<string, unknown>): string {
   switch (tool.method) {
@@ -261,12 +270,12 @@ export function formatResult(tool: BrowserTool, result: Record<string, unknown>)
       return lines.join("\n");
     }
     case "tabs": {
-      const tabs = Array.isArray(result.tabs) ? (result.tabs as Array<TabInfo & { active?: boolean; window_id?: number; dialog?: unknown }>) : [];
-      const lines = tabs.map(
-        (tab) => `- ${tabLine(tab)}${tab.active === true ? " (in front)" : ""}${tab.dialog !== undefined ? " (shows a dialog: answer it with browser_dialog)" : ""}`,
-      );
-      if (result.paused === true) lines.unshift("The user paused agents in the browser extension: do not act in these tabs until they resume.");
-      return lines.length > 0 ? lines.join("\n") : "The browser has no open tabs.";
+      if (Array.isArray(result.profiles)) {
+        return result.profiles.map(({ browser, listing }) =>
+          `browser=${JSON.stringify(browser)}\n${formatTabs(listing)}`
+        ).join("\n\n");
+      }
+      return typeof result.browser === "string" ? `browser=${quote(result.browser)}\n${formatTabs(result)}` : formatTabs(result);
     }
     case "open":
       return `Opened ${tabLine(result as unknown as TabInfo)}, in the background.`;

@@ -105,7 +105,7 @@ export const browserBridgeStateSchema = z
       z.object({ id: z.string(), name: z.string(), detected: z.boolean(), registered: z.boolean() }).strict(),
     ),
     connections: z.array(
-      z.object({ browser: z.string(), version: z.string(), extension: z.string(), pid: z.number() }).strict(),
+      z.object({ browser: z.string(), version: z.string(), extension: z.string(), pid: z.number(), selector: z.string().optional() }).strict(),
     ),
   })
   .strict();

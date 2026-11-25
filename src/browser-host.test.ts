@@ -126,7 +126,7 @@ describe("browser bridge calls", () => {
     await brave.started;
 
     const state = await bridgeState(layout, process.execPath);
-    expect(state.connections).toEqual([{ browser: "Brave", version: "155.0", extension: "0.1.0", pid: brave.child.pid }]);
+    expect(state.connections).toEqual([{ browser: "Brave", version: "155.0", extension: "0.1.0", pid: brave.child.pid, selector: expect.stringMatching(/^Brave@/) }]);
     const reply = await callBrowser(layout, "read", { tab_id: 4 });
     expect(reply).toEqual({ ok: true, browser: "Brave", result: { method: "read", params: { tab_id: 4 } } });
   });
@@ -180,6 +180,33 @@ describe("browser bridge calls", () => {
     chrome.child.stdin.end();
     await new Promise((resolve) => chrome.child.once("exit", resolve));
     expect(await callBrowser(layout, "tabs", {})).toMatchObject({ ok: true, browser: "Brave", result: "brave" });
+  });
+
+  it("lists both Chrome profiles and only acts through the selected connection", async () => {
+    const { layout } = tempLayout();
+    await installBridge(layout, process.execPath);
+    const opened: string[] = [];
+    const profile = (title: string) => fakeBrowser(layout, "Chrome", (method) => {
+      if (method === "tabs") return { tabs: [{ tab_id: 1, title }], paused: false };
+      opened.push(title);
+      return { tab_id: 2 };
+    });
+    const first = profile("First");
+    const second = profile("Second");
+    await Promise.all([first.started, second.started]);
+
+    const selector = (await bridgeState(layout, process.execPath)).connections.find(c => c.pid === second.child.pid)!.selector!;
+    const inventory = await callBrowser(layout, "tabs", {});
+    expect(inventory).toMatchObject({ ok: true, result: { profiles: expect.arrayContaining([
+      { browser: selector, listing: { tabs: [{ tab_id: 1, title: "Second" }], paused: false } },
+      { browser: expect.not.stringMatching(selector), listing: { tabs: [{ tab_id: 1, title: "First" }], paused: false } },
+    ]) } });
+    expect(await callBrowser(layout, "open", {}, { browser: "Chrome" })).toMatchObject({ code: "several_browsers" });
+    expect(await callBrowser(layout, "open", {}, { browser: selector })).toMatchObject({ ok: true });
+    second.child.stdin.end();
+    await new Promise((resolve) => second.child.once("exit", resolve));
+    expect(await callBrowser(layout, "open", {}, { browser: selector })).toMatchObject({ code: "no_such_browser" });
+    expect(opened).toEqual(["Second"]);
   });
 
   it("treats a blank browser name like none given", async () => {

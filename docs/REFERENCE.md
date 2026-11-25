@@ -172,6 +172,12 @@ Nothing changes until you turn it on:
    into a purple **Agent** tab group. **Pause agents** in the extension's
    toolbar popup stops them until you resume.
 
+When several profiles use the same browser, `browser_tabs` lists their tabs
+in separate sections. Use the section's `browser` selector to open a background
+copy of the URL and for later calls. A browser name alone cannot select between
+two matching profiles for an action. Selectors last for the connection;
+after a browser or bridge restart, list tabs again.
+
 While an agent clicks, types or chooses an option, a purple cursor glides to
 that spot in the tab and ripples on a click, then fades after five idle
 seconds. It never takes a click, `browser_read` and `browser_screenshot` leave
